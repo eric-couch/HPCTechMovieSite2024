@@ -2,8 +2,17 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (user is not null)
+{
+    <p>movie list for @user.UserName</p>
+    <ul>
+        @foreach (HPCTechMovieSite2024.Shared.OMDBMovie movie in Movies)
+        {
+            <li>Movie Title: @movie.Title</li>
+            <li>Movie Year: @movie.Year</li>
+            <li>Movie Plot: @movie.Plot</li>
+            <li>Poster: <img src=@($"https://img.omdbapi.com/?apikey=86c39163&i={movie.imdbID}") /></li>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+        }
+    </ul>
+}

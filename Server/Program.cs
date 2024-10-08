@@ -45,7 +45,9 @@ app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
+// default route /{controller}/{action=get}/{id}
 app.UseRouting();
+
 
 app.UseIdentityServer();
 app.UseAuthorization();

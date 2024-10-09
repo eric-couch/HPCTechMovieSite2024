@@ -1,0 +1,37 @@
+﻿@page "/event-handler-example"
+
+<h3>@currentHeading</h3>
+
+<p>
+    <label>
+        New Title
+        <input type="text" @bind="currentHeading" />
+    </label>
+    @for(var i=0;i<4;i++)
+    {
+        <button @onclick="UpdateHeading">where is my mouse at?</button>
+    }
+   
+
+    <p>
+        <input type="checkbox" @onchange="CheckChanged" />
+        @checkMessage
+    </p>
+</p>
+
+@code {
+    public string currentHeading { get; set; } = "Initial Heading";
+    public string newHeading { get; set; }
+    public string checkMessage { get; set; }
+
+    private void UpdateHeading(MouseEventArgs args)
+    {
+        currentHeading = $"{newHeading} x coords:{args.ScreenX} y coords:{args.ScreenY}";
+    }
+
+    private void CheckChanged(ChangeEventArgs args)
+    {
+        var x = args.Value;
+        checkMessage = $"  checkbox is {((bool)x ? "" : "not")} checked. last changed at {DateTime.Now}";
+    }
+}

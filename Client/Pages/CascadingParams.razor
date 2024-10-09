@@ -1,0 +1,10 @@
+﻿@page "/cascading-params"
+
+<h3>CascadingParams</h3>
+<CascadingValue Value="@TheAnswer">
+    <Foo />
+</CascadingValue>
+
+@code {
+    int TheAnswer = 42;
+}

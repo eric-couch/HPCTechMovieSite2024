@@ -1,0 +1,11 @@
+﻿<h3>this is the child, param: @number</h3>
+
+<button @onclick="OnClickCallback">click here for callback</button>
+
+
+@code {
+    [Parameter]
+    public int number { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+}

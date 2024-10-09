@@ -1,0 +1,18 @@
+﻿@page "/parent"
+
+<h3>Parent</h3>
+
+<Child number="5" OnClickCallback="@ShowMessage" />
+
+<p>we're back at the parent page</p>
+
+<p>@message</p>
+
+@code {
+    public string? message { get; set; }
+
+    private void ShowMessage(MouseEventArgs args)
+    {
+        message = $"We're learning blazor {args.ScreenX} {args.ScreenY}";
+    }
+}

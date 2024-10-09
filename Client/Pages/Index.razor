@@ -8,11 +8,7 @@
     <ul>
         @foreach (HPCTechMovieSite2024.Shared.OMDBMovie movie in Movies)
         {
-            <li>Movie Title: @movie.Title</li>
-            <li>Movie Year: @movie.Year</li>
-            <li>Movie Plot: @movie.Plot</li>
-            <li>Poster: <img src=@($"https://img.omdbapi.com/?apikey=86c39163&i={movie.imdbID}") /></li>
-
+            <MovieDetails Movie="movie" />
         }
     </ul>
 }

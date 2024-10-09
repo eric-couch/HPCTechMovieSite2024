@@ -1,0 +1,12 @@
+﻿@page "/event-handler-example-2"
+
+<h3>@heading</h3>
+
+<p>
+    <button @onclick="@(e => heading = $"new heading x pos: {e.ScreenX}")">update heading</button>
+</p>
+
+
+@code {
+    private string heading { get; set; } = "Initial heading";
+}

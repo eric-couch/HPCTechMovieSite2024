@@ -1,0 +1,22 @@
+﻿@page "/event-handler-example-3"
+
+<h3>@heading</h3>
+
+@for (var i=0;i<4;i++)
+{
+    var buttonNumber = i;
+    <p>
+        <button @onclick="@(e => UpdateHeading(e, buttonNumber))">button #@buttonNumber</button>
+    </p>
+}
+
+
+
+@code {
+    private string heading { get; set; } = "Initial heading";
+
+    private void UpdateHeading(MouseEventArgs args, int i)
+    {
+        heading = $"button #{i} clicked at {args.ScreenX} {args.ScreenY}";
+    }
+}

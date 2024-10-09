@@ -11,7 +11,7 @@ public partial class Index
 
     public List<OMDBMovie> Movies { get; set; } = new();
 
-    public UserDto user { get; set; }
+    public UserDto? user { get; set; } = null;
     private string OMDBUrl = "https://www.omdbapi.com/?";
     private string apiKey = "apikey=86c39163";
     protected override async Task OnInitializedAsync()

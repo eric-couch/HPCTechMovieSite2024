@@ -1,0 +1,40 @@
+﻿@page "/search"
+@using HPCTechMovieSite2024.Shared
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+
+<div class="container-fluid mb-5">
+    <div class="row">
+        <div class="col-3">
+            <input type="test" class="form-control" @bind="searchTerm" />
+        </div>
+        <div class="col-1">
+            <button class="btn btn-primary" @onclick="SearchOMDB">Search</button>
+        </div>
+    </div>
+</div>
+
+@if (searchResult?.Search?.Any() ?? false)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-9">
+                <SfPager @ref="Page" PageSize="10" TotalItemsCount="@totalItems" ItemClick="PageClick"></SfPager>
+                <SfGrid DataSource="OMDBMovies" TValue="MovieSearchResultItem">
+                    <GridEvents TValue="MovieSearchResultItem"
+                                RowSelected="GetSelectedRows">
+                    </GridEvents>
+                    <GridColumns>
+                        <GridColumn Field="Title"></GridColumn>
+                        <GridColumn Field="Year"></GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+            <div class="col">
+                @if (@omdbMovie is not null) {
+                    <MovieDetails Movie="omdbMovie" />
+                }
+            </div>
+        </div>
+    </div>
+}

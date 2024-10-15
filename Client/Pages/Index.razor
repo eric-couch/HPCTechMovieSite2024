@@ -1,14 +1,28 @@
 ﻿@page "/"
+@using HPCTechMovieSite2024.Shared
+@using Syncfusion.Blazor.Notifications
 
 <PageTitle>Index</PageTitle>
 
-@if (user is not null)
+@if (Movies?.Any() ?? false)
 {
-    <p>movie list for @user.UserName</p>
-    <ul>
-        @foreach (HPCTechMovieSite2024.Shared.OMDBMovie movie in Movies)
-        {
-            <MovieDetails Movie="movie" />
-        }
-    </ul>
+    <p>Favorite Movie List @(user is not null ? user.UserName : "")</p>
+    <div class="container">
+        <div class="row">
+            @foreach (OMDBMovie movie in Movies)
+            {
+                <div class="col-lg-3 my-4">
+                    <MovieDetails Movie="movie" OnRemoveFavoriteMovie="RemoveFavoriteMovie" AllowDelete="true" />
+                </div>
+            }
+        </div>
+    </div>
 }
+<SfToast    @ref="ToastObj"
+            Content="@toastContent"
+            CssClass="@toastSuccess"
+            ShowCloseButton="true"
+            ShowProgressBar="true"
+            Timeout="3000">
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>

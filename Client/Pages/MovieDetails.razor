@@ -1,7 +1,24 @@
 ﻿@if (Movie is not null)
 {
-    <li>Movie Title: @Movie.Title</li>
-    <li>Movie Year: @Movie.Year</li>
-    <li>Movie Plot: @Movie.Plot</li>
-    <li>Poster: <img src=@($"https://img.omdbapi.com/?apikey=86c39163&i={Movie.imdbID}") /></li>
+    <div class="card border rounded bg-white">
+        <img class="card-img-top" src=@($"https://img.omdbapi.com/?apikey=86c39163&i={Movie.imdbID}") />
+    </div>
+    <div class="card-body">
+        <h5>@Movie.Title (@Movie.Year)</h5>
+        <ul class="list-group list-group-flush">
+            @if (Movie.Actors?.Any() ?? false)
+            {
+                @foreach (var actor in Movie.Actors.Split(", "))
+                {
+                    <li class="list-group-item">@actor</li>
+                }
+            }
+        </ul>
+        @if (AllowDelete)
+        {
+            <button class="btn btn-primary" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>
+        }
+
+        
+    </div>
 }

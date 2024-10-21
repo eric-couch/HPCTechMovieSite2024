@@ -3,78 +3,79 @@ using HPCTechMovieSite2024.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HPCTechMovieSite2024.Shared;
+using HPCTechMovieSite2024.Shared.Wrapper;
 using Microsoft.AspNetCore.Identity;
 using HPCTechMovieSite2024.Server.Models;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using HPCTechMovieSite2024.Shared.Wrapper;
+using HPCTechMovieSite2024.Server.Services;
 
 namespace HPCTechMovieSite2024.Server.Controllers;
 
 public class UserController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IUserService _userService;
 
-    public UserController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+    public UserController(      IUserService userService)
     {
-        _context = context;
-        _userManager = userManager;
+        _userService = userService;
     }
 
     [Route("api/User")]
-    public async Task<IActionResult> GetMovies([FromQuery(Name ="userName")] string userName)
+    public async Task<DataResponse<UserDto>> GetMovies(string? userName = null)
     {
-        var user = await _userManager.FindByNameAsync(userName);
+        
+        if (userName is null) {
+            userName = User.Identity.Name;
+        }
 
-        UserDto? movies = await _context.Users.Include(u => u.FavoriteMovies)
-                                .Select(u => new UserDto
-                                {
-                                    Id = u.Id,
-                                    UserName = u.UserName,
-                                    FavoriteMovies = u.FavoriteMovies
-                                }).FirstOrDefaultAsync(u => u.Id == user.Id);
-        if (movies != null)
+        // UserService.GetMovies
+        var userDto = await _userService.GetMovies(userName);
+
+        if (userDto != null)
         {
-            return Ok(movies);
+            return new DataResponse<UserDto>() { Data = userDto, Success = true };
         } else
         {
-            return NotFound();
+            return new DataResponse<UserDto>() { Data = new UserDto(), Success = false, Message = "user not found." };
         }
         
     }
 
-    [HttpPost]
-    [Route("api/add-movie")]
-    public async Task<ActionResult> AddMovie([FromBody] Movie movie)
-    {
-        var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    //[HttpPost]
+    //[Route("api/add-movie")]
+    //public async Task<Response> AddMovie([FromBody] Movie movie)
+    //{
+    //    var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-        if (user is null)
-        {
-            return NotFound();
-        }
+    //    if (user is null)
+    //    {
+    //        return new Response(false, "Failed to Add Movie");
+    //    }
 
-        user.FavoriteMovies.Add(movie);
-        await _context.SaveChangesAsync();
-        return Ok();
-    }
+    //    user.FavoriteMovies.Add(movie);
+    //    await _context.SaveChangesAsync();
+    //    return new Response(true, "Successfully Added Movie");
+    //}
 
-    [HttpPost]
-    [Route("api/remove-movie")]
-    public async Task<ActionResult> RemoveMovie([FromBody] Movie movie)
-    {
-        var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
-        if (user is null)
-        {
-            return NotFound();
-        }
+    //[HttpPost]
+    //[Route("api/remove-movie")]
+    //public async Task<Response> RemoveMovie([FromBody] Movie movie)
+    //{
+    //    var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    //    if (user is null)
+    //    {
+    //        return new Response(false, "Failed to Remove Movie");
+    //    }
 
-        var movieToRemove = _context.Users.Include(u => u.FavoriteMovies)
-                                    .FirstOrDefault(u => u.Id == user.Id)
-                                    .FavoriteMovies.FirstOrDefault(m => m.imdbId == movie.imdbId);
-        _context.Movies.Remove(movieToRemove);
-        _context.SaveChangesAsync();
-        return Ok();
-    }
+    //    var movieToRemove = _context.Users.Include(u => u.FavoriteMovies)
+    //                                .FirstOrDefault(u => u.Id == user.Id)
+    //                                .FavoriteMovies.FirstOrDefault(m => m.imdbId == movie.imdbId);
+    //    _context.Movies.Remove(movieToRemove);
+    //    _context.SaveChangesAsync();
+    //    return new Response(true, "Successfully Removed Movie");
+    //}
 
     [Route("api/Hello/{name}")]
     public IActionResult Hello(string name)

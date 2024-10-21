@@ -4,51 +4,55 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components.Authorization;
 using Syncfusion.Blazor.Notifications.Internal;
 using Syncfusion.Blazor.Notifications;
+using HPCTechMovieSite2024.Client.HttpRepo;
+using System.Diagnostics;
+using Syncfusion.Blazor.PivotView;
+using HPCTechMovieSite2024.Shared.Wrapper;
 
 namespace HPCTechMovieSite2024.Client.Pages;
 
 public partial class Index
 {
     [Inject]
-    public HttpClient _httpClient {  get; set; }
-    [Inject]
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+    [Inject]
+    public IUserMoviesHttpRepo UserMoviesHttpRepo { get; set; }
 
     public List<OMDBMovie> Movies { get; set; } = new();
     public SfToast ToastObj;
     private string? toastContent = String.Empty;
     private string? toastSuccess = "e-toast-success";
     public UserDto? user { get; set; } = null;
-    private string OMDBUrl = "https://www.omdbapi.com/?";
-    private string apiKey = "apikey=86c39163";
+    
     protected override async Task OnInitializedAsync()
     {
         var userAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
-        if (userAuth is not null && userAuth.IsAuthenticated )
+        if (userAuth is not null && userAuth.IsAuthenticated)
         {
-            user = await _httpClient.GetFromJsonAsync<UserDto>($"api/User?userName={userAuth.Name}");
-
-            if (user is not null)
+            var response = await UserMoviesHttpRepo.GetMovies();
+            if (response.Success)
             {
-                foreach (Movie movie in user.FavoriteMovies)
-                {
-                    OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBUrl}{apiKey}&i={movie.imdbId}");
-                    if (movie is not null)
-                    {
-                        Movies.Add(omdbMovie);
-                    }
-                }
+                Movies = response.Data;
+            } else
+            {
+                // log error
+                Debug.Print(response.Message);
+                // show toast to user that something went wrong
+                toastContent = $"Error: {response.Message}";
+                toastSuccess = "e-toast-warning";
+                StateHasChanged();
+                await ToastObj.ShowAsync();
             }
         }
     }
 
     private async Task RemoveFavoriteMovie(OMDBMovie movie)
     {
-        Movie newMovie = new Movie() { imdbId = movie.imdbID };
-        var response = await _httpClient.PostAsJsonAsync("api/remove-movie", newMovie);
-        Movies.Remove(movie);
-        if (response.IsSuccessStatusCode)
+
+        Response response = await UserMoviesHttpRepo.RemoveMovie(movie.imdbID);
+        if (response.Success)
         {
+            Movies.Remove(movie);
             toastContent = $"Removed {movie.Title} from your favorites.";
             StateHasChanged();
             await ToastObj.ShowAsync();

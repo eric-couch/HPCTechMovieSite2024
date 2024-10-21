@@ -5,6 +5,7 @@ using Syncfusion.Blazor.Navigations;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.PivotView;
 using Syncfusion.Blazor.Notifications;
+using HPCTechMovieSite2024.Client.HttpRepo;
 
 namespace HPCTechMovieSite2024.Client.Pages;
 
@@ -12,6 +13,8 @@ public partial class Search
 {
     [Inject]
     public HttpClient _httpClient { get; set; }
+    [Inject]
+    public IUserMoviesHttpRepo UserMoviesHttpRepo { get; set; }
     public SfPager? Page;
     public SfGrid<MovieSearchResultItem> movieGrid;
     public SfToast ToastObj;
@@ -48,10 +51,9 @@ public partial class Search
             {
                 foreach (MovieSearchResultItem movie in selectedMovies)
                 {
-                    Movie newMovie = new Movie() { imdbId = movie.imdbID };
-                    var response = await _httpClient.PostAsJsonAsync("api/add-movie", newMovie);
+                    var response = await UserMoviesHttpRepo.AddMovie(movie.imdbID);
 
-                    if (response.IsSuccessStatusCode)
+                    if (response.Success)
                     {
                         toastContent = $"Added {movie.Title} to your favorites.";
                         StateHasChanged();

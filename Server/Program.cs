@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using HPCTechMovieSite2024.Server.Data;
 using HPCTechMovieSite2024.Server.Models;
 using Microsoft.AspNetCore.Identity;
+using HPCTechMovieSite2024.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddIdentityServer()
 
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
+
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();

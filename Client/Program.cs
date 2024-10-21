@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HPCTechMovieSite2024.Client;
+using HPCTechMovieSite2024.Client.HttpRepo;
 using Syncfusion.Blazor;
 
 Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9fcHVWQmJeU0d+XUM=");
@@ -18,5 +19,6 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 
 builder.Services.AddApiAuthorization();
 builder.Services.AddSyncfusionBlazor();
+builder.Services.AddScoped<IUserMoviesHttpRepo, UserMoviesHttpRepo>();
 
 await builder.Build().RunAsync();

@@ -6,7 +6,7 @@ namespace HPCTechMovieSite2024.Client.HttpRepo;
 public interface IUserMoviesHttpRepo
 {
     // get movies
-    Task<DataResponse<List<OMDBMovie>>> GetMovies();
+    Task<DataResponse<List<OMDBMovie>>> GetMovies(string userName);
     // add movie
     Task<Response> AddMovie(string imdbId);
     // remove movie

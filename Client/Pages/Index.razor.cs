@@ -17,6 +17,8 @@ public partial class Index
     public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject]
     public IUserMoviesHttpRepo UserMoviesHttpRepo { get; set; }
+    [Inject]
+    public ILogger<Index> Logger { get; set; }
 
     public List<OMDBMovie> Movies { get; set; } = new();
     public SfToast ToastObj;
@@ -29,14 +31,15 @@ public partial class Index
         var userAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
         if (userAuth is not null && userAuth.IsAuthenticated)
         {
-            var response = await UserMoviesHttpRepo.GetMovies();
+            var response = await UserMoviesHttpRepo.GetMovies(userAuth.Name);
             if (response.Success)
             {
                 Movies = response.Data;
+                Logger.LogInformation("return successful for user {user}", userAuth.Name);
             } else
             {
                 // log error
-                Debug.Print(response.Message);
+                Logger.LogError(response.Message);
                 // show toast to user that something went wrong
                 toastContent = $"Error: {response.Message}";
                 toastSuccess = "e-toast-warning";

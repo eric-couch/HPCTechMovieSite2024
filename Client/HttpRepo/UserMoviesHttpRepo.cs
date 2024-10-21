@@ -19,12 +19,12 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
         _httpClient = httpClient;
     }
 
-    public async Task<DataResponse<List<OMDBMovie>>> GetMovies()
+    public async Task<DataResponse<List<OMDBMovie>>> GetMovies(string userName)
     {
         try
         {
             var Movies = new List<OMDBMovie>();
-            string apiEndPoint = $"api/User";
+            string apiEndPoint = $"api/User?userName={userName}";
             DataResponse<UserDto> response = await _httpClient.GetFromJsonAsync<DataResponse<UserDto>>(apiEndPoint);
 
             if (response.Success)

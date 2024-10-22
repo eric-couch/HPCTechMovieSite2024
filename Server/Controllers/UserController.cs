@@ -22,6 +22,7 @@ public class UserController : Controller
         _userService = userService;
     }
 
+    [HttpGet]
     [Route("api/User")]
     public async Task<DataResponse<UserDto>> GetMovies(string? userName = null)
     {
@@ -77,6 +78,7 @@ public class UserController : Controller
     //    return new Response(true, "Successfully Removed Movie");
     //}
 
+    [HttpGet]
     [Route("api/Hello/{name}")]
     public IActionResult Hello(string name)
     {

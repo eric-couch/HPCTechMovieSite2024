@@ -5,4 +5,5 @@ namespace HPCTechMovieSite2024.Server.Services;
 public interface IUserService
 {
     Task<UserDto>? GetMovies(string userName);
+    Task<List<UserEditDto>> GetUsers();
 }

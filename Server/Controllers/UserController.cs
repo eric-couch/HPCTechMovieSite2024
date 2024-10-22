@@ -44,6 +44,14 @@ public class UserController : Controller
         
     }
 
+    [HttpGet]
+    [Route("api/users")]
+    public async Task<List<UserEditDto>> GetUsers()
+    {
+        var users = await _userService.GetUsers();
+        return users;
+    }
+
     //[HttpPost]
     //[Route("api/add-movie")]
     //public async Task<Response> AddMovie([FromBody] Movie movie)

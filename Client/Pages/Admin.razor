@@ -1,0 +1,20 @@
+﻿@page "/admin"
+
+@using Syncfusion.Blazor.Grids
+@using HPCTechMovieSite2024.Shared
+
+@if (Users?.Any() ?? false)
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="column">
+                <SfGrid DataSource="Users" TValue="UserEditDto" @ref="UserGrid" AllowSorting="true">
+                    <GridColumns>
+                        <GridColumn Field="UserName"></GridColumn>
+                        <GridColumn Field="Email"></GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </div>
+        </div>
+    </div>
+}

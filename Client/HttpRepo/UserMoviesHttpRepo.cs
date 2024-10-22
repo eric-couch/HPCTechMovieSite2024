@@ -132,4 +132,39 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
             return new Response("Add Movie Failed.");
         }
     }
+
+    public async Task<DataResponse<List<UserEditDto>>> GetUsers()
+    {
+        try
+        {
+            var users = await _httpClient.GetFromJsonAsync<List<UserEditDto>>("api/users");
+            if (users is not null)
+            {
+                return new DataResponse<List<UserEditDto>>()
+                {
+                    Data = users,
+                    Message = "Success",
+                    Success = true
+                };
+            } else
+            {
+                return new DataResponse<List<UserEditDto>>()
+                {
+                    Data = new List<UserEditDto>(),
+                    Message = "Users not found",
+                    Success = false
+                };
+            }
+        } catch (Exception ex)
+        {
+            return new DataResponse<List<UserEditDto>>()
+            {
+                Data = new List<UserEditDto>(),
+                Message = ex.Message,
+                Success = false
+            };
+        }
+        
+
+    }
 }

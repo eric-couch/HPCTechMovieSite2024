@@ -45,6 +45,24 @@ public class UserService : IUserService
             _logger.LogError("User {userName} encountered error {ex.Message}. Logged at {Placeholder:MMMM dd, yyyy}", userName, ex.Message, DateTimeOffset.UtcNow);
             return null;
         }
-        
+    }
+
+    public async Task<List<UserEditDto>> GetUsers()
+    {
+        var users = (from u in _context.Users
+                     let query = (from ur in _context.Set<IdentityUserRole<string>>()
+                                  where ur.UserId.Equals(u.Id)
+                                  join r in _context.Roles on ur.RoleId equals r.Id
+                                  select r.Name).ToList()
+                     select new UserEditDto
+                     {
+                         Id = u.Id,
+                         UserName = u.UserName,
+                         Email = u.Email,
+                         EmailConfirmed = u.EmailConfirmed,
+                         Admin = query.Contains("Admin")
+                     }).ToList();
+        _logger.LogInformation("Retrieving All Users.");
+        return users;
     }
 }

@@ -2,6 +2,9 @@
 
 @using Syncfusion.Blazor.Grids
 @using HPCTechMovieSite2024.Shared
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Popups
 
 @if (Users?.Any() ?? false)
 {
@@ -9,12 +12,60 @@
         <div class="row">
             <div class="column">
                 <SfGrid DataSource="Users" TValue="UserEditDto" @ref="UserGrid" AllowSorting="true">
+                    <GridEvents TValue="UserEditDto" OnRecordDoubleClick="UserDoubleClickHandler"></GridEvents>
                     <GridColumns>
                         <GridColumn Field="UserName"></GridColumn>
                         <GridColumn Field="Email"></GridColumn>
+                        <GridColumn Field="FirstName" HeaderText="First Name" Width="200"></GridColumn>
+                        <GridColumn Field="LastName" HeaderText="Last Name" Width="200"></GridColumn>
+                        <GridColumn Field="EmailConfirmed" HeaderText="Email Confirmed" Width="150">
+                            <Template>
+                                @{
+                                    // context
+                                    var userEditDto = context as UserEditDto;
+
+                                    <SfCheckBox     @bind-Checked="userEditDto.EmailConfirmed" 
+                                                    TChecked="bool"
+                                                    @onchange="eventArgs => { ToggleEnableUser(eventArgs, userEditDto.Id);}"></SfCheckBox>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="Admin" Width="150">
+                            <Template>
+                                @{
+                                    var userEditDto = context as UserEditDto;
+
+                                    <SfCheckBox @bind-Checked="userEditDto.Admin"
+                                                TChecked="bool"
+                                                @onchange="eventArgs => { ToggleAdmin(eventArgs, userEditDto.Id);}"></SfCheckBox>
+                                }
+                            </Template>
+                        </GridColumn>
                     </GridColumns>
                 </SfGrid>
             </div>
         </div>
     </div>
 }
+<SfDialog Width="800" Height="800" IsModal="true" @bind-Visible="@IsUserModalVisible">
+    <DialogTemplates>
+        <Header>Add/Edit User</Header>
+        <Content>
+            <EditForm Model="@userEditDto" OnValidSubmit="AddUserOnSubmit">
+                <DataAnnotationsValidator />
+                <label for="email">
+                    Email
+                </label>
+                <SfTextBox ID="email" Placeholder="Email" @bind-Value="@userEditDto.Email"></SfTextBox>
+                <ValidationMessage For="@(() => userEditDto.Email)" />
+                <label for="firstname">
+                    First Name
+                </label>
+                <SfTextBox ID="firstname" Placeholder="First Name" @bind-Value="@userEditDto.FirstName"></SfTextBox>
+                <ValidationMessage For="@(() => userEditDto.FirstName)" />
+                <SfButton IsPrimary="true" typeof="Submit">Update User</SfButton>
+                <SfButton IsPrimary="true" Type="Button" title="Cancel" @onclick="@(() => {Reset();})">Cancel</SfButton>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>

@@ -12,6 +12,8 @@ public partial class Admin
     public IUserMoviesHttpRepo UserMoviesHttpRepo { get; set; }
     public List<UserEditDto>? Users { get; set; }
     public SfGrid<UserEditDto> UserGrid;
+    public bool IsUserModalVisible { get; set; } = false;
+    public UserEditDto userEditDto { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -23,5 +25,40 @@ public partial class Admin
         {
             // add toast
         }
+    }
+
+    public async Task ToggleEnableUser(ChangeEventArgs args, string userId)
+    {
+        bool response = await UserMoviesHttpRepo.EmailConfirmUser(userId);
+        if (!response)
+        {
+            // toast response to user
+        }
+    }
+
+    public async Task ToggleAdmin(ChangeEventArgs args, string userId)
+    {
+        bool response = await UserMoviesHttpRepo.ToggleAdmin(userId);
+        if (!response)
+        {
+            // toast response to user
+        }
+    }
+
+    public async Task UserDoubleClickHandler(RecordDoubleClickEventArgs<UserEditDto> args)
+    {
+        userEditDto = args.RowData;
+        IsUserModalVisible = true;
+    }
+
+    public async Task AddUserOnSubmit()
+    {
+        //var response = await UserMoviesHttpRepo.UserUser(userEditDto);
+    }
+
+    public void Reset()
+    {
+        userEditDto = new();
+        IsUserModalVisible = false;
     }
 }

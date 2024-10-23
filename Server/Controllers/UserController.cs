@@ -52,6 +52,24 @@ public class UserController : Controller
         return users;
     }
 
+    [HttpGet]
+    [Route("api/toggle-email-confirmed")]
+    [Authorize(Roles ="Admin")]
+    public async Task<bool> ToggleEmailConfirmed(string userId)
+    {
+        bool response = await _userService.ToggleEmailConfirmed(userId);
+        return response;
+    }
+
+    [HttpGet]
+    [Route("api/toggle-admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<bool> ToggleAdmin(string userId)
+    {
+        bool response = await _userService.ToggleAdmin(userId);
+        return response;
+    }
+
     //[HttpPost]
     //[Route("api/add-movie")]
     //public async Task<Response> AddMovie([FromBody] Movie movie)

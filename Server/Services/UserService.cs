@@ -58,11 +58,55 @@ public class UserService : IUserService
                      {
                          Id = u.Id,
                          UserName = u.UserName,
+                         FirstName = u.FirstName,
+                         LastName = u.LastName,
                          Email = u.Email,
                          EmailConfirmed = u.EmailConfirmed,
                          Admin = query.Contains("Admin")
                      }).ToList();
         _logger.LogInformation("Retrieving All Users.");
         return users;
+    }
+
+    public async Task<bool> ToggleEmailConfirmed(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return false;
+        }
+        user.EmailConfirmed = !user.EmailConfirmed;
+        await _userManager.UpdateAsync(user);
+        return true;
+    }
+
+    public async Task<bool> ToggleAdmin(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return false;
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        if (roles.Contains("Admin"))
+        {
+            //await _userManager.RemoveFromRoleAsync(user, "Admin");
+            var admin = await (from ur in _context.UserRoles
+                                join r in _context.Roles on ur.RoleId equals r.Id
+                                where ur.UserId == userId
+                                where r.Name == "Admin"
+                                select ur).FirstOrDefaultAsync();
+            if (admin is not null)
+            {
+                _context.UserRoles.Remove(admin);
+                _context.SaveChanges();
+            }
+            
+        } else
+        {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        }
+        return true;
     }
 }

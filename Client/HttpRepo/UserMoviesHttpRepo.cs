@@ -164,7 +164,17 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
                 Success = false
             };
         }
-        
+    }
 
+    public async Task<bool> EmailConfirmUser(string userId)
+    {
+        var response = await _httpClient.GetFromJsonAsync<bool>($"api/toggle-email-confirmed?userId={userId}");
+        return response;
+    }
+
+    public async Task<bool> ToggleAdmin(string userId)
+    {
+        var response = await _httpClient.GetFromJsonAsync<bool>($"api/toggle-admin?userId={userId}");
+        return response;
     }
 }

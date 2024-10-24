@@ -68,6 +68,20 @@ public class UserService : IUserService
         return users;
     }
 
+    public async Task<bool> UpdateUser(UserEditDto user)
+    {
+        var userToUpdate = await _userManager.FindByNameAsync(user.Email);
+        if (userToUpdate is null) {
+            return false;
+        }
+        userToUpdate.FirstName = user.FirstName;
+        userToUpdate.LastName = user.LastName;
+        userToUpdate.Email = user.Email;
+        userToUpdate.EmailConfirmed = user.EmailConfirmed;
+        await _userManager.UpdateAsync(userToUpdate);
+        return true;
+    }
+
     public async Task<bool> ToggleEmailConfirmed(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);

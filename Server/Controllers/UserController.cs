@@ -70,6 +70,15 @@ public class UserController : Controller
         return response;
     }
 
+    [HttpPost]
+    [Route("api/update-user")]
+    [Authorize(Roles ="Admin")]
+    public async Task<bool> UpdateUser([FromBody] UserEditDto user)
+    {
+        bool res = await _userService.UpdateUser(user);
+        return res;
+    }
+
     //[HttpPost]
     //[Route("api/add-movie")]
     //public async Task<Response> AddMovie([FromBody] Movie movie)

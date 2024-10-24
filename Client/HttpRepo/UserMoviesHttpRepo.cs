@@ -166,6 +166,18 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
         }
     }
 
+    public async Task<Response> UpdateUser(UserEditDto user)
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/update-user", user);
+        if (response.IsSuccessStatusCode)
+        {
+            return new Response(true, "Success");
+        } else
+        {
+            return new Response(false, "Failed api call");
+        }
+    }
+
     public async Task<bool> EmailConfirmUser(string userId)
     {
         var response = await _httpClient.GetFromJsonAsync<bool>($"api/toggle-email-confirmed?userId={userId}");

@@ -5,6 +5,7 @@
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Notifications
 
 @if (Users?.Any() ?? false)
 {
@@ -53,19 +54,68 @@
         <Content>
             <EditForm Model="@userEditDto" OnValidSubmit="AddUserOnSubmit">
                 <DataAnnotationsValidator />
-                <label for="email">
-                    Email
-                </label>
-                <SfTextBox ID="email" Placeholder="Email" @bind-Value="@userEditDto.Email"></SfTextBox>
-                <ValidationMessage For="@(() => userEditDto.Email)" />
-                <label for="firstname">
-                    First Name
-                </label>
-                <SfTextBox ID="firstname" Placeholder="First Name" @bind-Value="@userEditDto.FirstName"></SfTextBox>
-                <ValidationMessage For="@(() => userEditDto.FirstName)" />
-                <SfButton IsPrimary="true" typeof="Submit">Update User</SfButton>
-                <SfButton IsPrimary="true" Type="Button" title="Cancel" @onclick="@(() => {Reset();})">Cancel</SfButton>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="email">
+                            Email
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <SfTextBox ID="email" Placeholder="Email" @bind-Value="@userEditDto.Email"></SfTextBox>
+                        <ValidationMessage For="@(() => userEditDto.Email)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="firstname">
+                            First Name
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <SfTextBox ID="firstname" Placeholder="First Name" @bind-Value="@userEditDto.FirstName"></SfTextBox>
+                        <ValidationMessage For="@(() => userEditDto.FirstName)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="lastname">
+                            Last Name
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <SfTextBox ID="lastname" Placeholder="Last Name" @bind-Value="@userEditDto.LastName"></SfTextBox>
+                        <ValidationMessage For="@(() => userEditDto.LastName)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label for="emailconfirmed">
+                            Email Confirmed
+                        </label>
+                    </div>
+                    <div class="col-md-8">
+                        <SfCheckBox id="emailconfirmed" @bind-Checked="@userEditDto.EmailConfirmed"></SfCheckBox>
+                        <ValidationMessage For="@(() => userEditDto.EmailConfirmed)" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <SfButton IsPrimary="true" typeof="Submit">Update User</SfButton>
+                    </div>
+                    <div class="col-md-2">
+                        <SfButton IsPrimary="true" Type="Button" title="Cancel" @onclick="@(() => {Reset();})">Cancel</SfButton>
+                    </div>
+                </div>
             </EditForm>
         </Content>
     </DialogTemplates>
 </SfDialog>
+
+<SfToast    @ref="ToastObj"
+            Content="@toastContent"
+            CssClass="@toastSuccess"
+            ShowCloseButton="true"
+            ShowProgressBar="true"
+            Timeout="3000">
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>

@@ -5,6 +5,8 @@ using HPCTechMovieSite2024.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace HPCTechMovieSite2024.Server.Services;
 
@@ -14,14 +16,19 @@ public class UserService : IUserService
     private readonly ApplicationDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly ILogger<UserService> _logger;
+    private readonly HttpClient _httpClient;
+    private readonly string OMDBUrl = "https://www.omdbapi.com/?";
+    private readonly string apiKey = "apikey=86c39163";
 
     public UserService(     ApplicationDbContext context, 
                             UserManager<ApplicationUser> userManager,
-                            ILogger<UserService> logger)
+                            ILogger<UserService> logger,
+                            HttpClient httpClient)
     {
         _context = context;
         _userManager = userManager;
         _logger = logger;
+        _httpClient = httpClient;
     }
 
     public async Task<UserDto>? GetMovies(string userName)
@@ -37,6 +44,32 @@ public class UserService : IUserService
                                         UserName = u.UserName,
                                         FavoriteMovies = u.FavoriteMovies
                                     }).FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            var missingMovies = (from m in movies.FavoriteMovies
+                                 where !_context.OMDBMovies.Any(omdb => omdb.imdbID == m.imdbId)
+                                 select m).ToList();
+
+            foreach (var movie in missingMovies)
+            {
+                OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBUrl}{apiKey}&i={movie.imdbId}");
+                if (omdbMovie is not null)
+                {
+                    await _context.Rating.AddRangeAsync(omdbMovie.Ratings);
+                    await _context.OMDBMovies.AddAsync(omdbMovie);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            // grab all of the omdb moves for the user and add it to the user dto
+            var omdbMoviesForUser = await (from omdb in _context.OMDBMovies
+                                           join m in _context.Movies on omdb.imdbID equals m.imdbId
+                                           join u in _context.Users on m.ApplicationUserId equals u.Id
+                                           where m.ApplicationUserId == user.Id
+                                           select omdb)
+                                           .Include(omdb => omdb.Ratings)
+                                           .ToListAsync();
+
+            movies.OMDBMovies = omdbMoviesForUser;
 
             _logger.LogInformation("User {userName} retrieved {Count} movies. Logged at {Placeholder:MMMM dd, yyyy}", userName, movies.FavoriteMovies.Count, DateTimeOffset.UtcNow);
             return movies;

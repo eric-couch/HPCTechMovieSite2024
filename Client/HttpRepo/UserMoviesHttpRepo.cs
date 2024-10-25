@@ -1,4 +1,5 @@
-﻿using HPCTechMovieSite2024.Shared;
+﻿using Blazored.LocalStorage;
+using HPCTechMovieSite2024.Shared;
 using HPCTechMovieSite2024.Shared.Wrapper;
 using Newtonsoft.Json;
 using Syncfusion.Blazor.PivotView;
@@ -11,12 +12,14 @@ namespace HPCTechMovieSite2024.Client.HttpRepo;
 public class UserMoviesHttpRepo : IUserMoviesHttpRepo
 {
     public readonly HttpClient _httpClient;
+    public readonly ILocalStorageService _localStorage;
     private readonly string OMDBUrl = "https://www.omdbapi.com/?";
     private readonly string apiKey = "apikey=86c39163";
 
-    public UserMoviesHttpRepo(HttpClient httpClient)
+    public UserMoviesHttpRepo(HttpClient httpClient, ILocalStorageService localStorage)
     {
         _httpClient = httpClient;
+        _localStorage = localStorage;
     }
 
     public async Task<DataResponse<List<OMDBMovie>>> GetMovies(string userName)
@@ -29,22 +32,31 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
 
             if (response.Success)
             {
-                UserDto user = response.Data;
-                if (user is not null)
-                {
-                    foreach (Movie movie in user.FavoriteMovies)
-                    {
-                        OMDBMovie omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBUrl}{apiKey}&i={movie.imdbId}");
-                        if (movie is not null)
-                        {
-                            Movies.Add(omdbMovie);
-                        }
-                    }
-                }
+                //UserDto user = response.Data;
+                //if (user is not null)
+                //{
+                //    foreach (Movie movie in user.FavoriteMovies)
+                //    {
+                        
+                //        if (movie is not null)
+                //        {
+                //            OMDBMovie omdbMovie = new();
+
+                //            omdbMovie = await _localStorage.GetItemAsync<OMDBMovie>(movie.imdbId);
+
+                //            if (omdbMovie is null)
+                //            {
+                //                omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBUrl}{apiKey}&i={movie.imdbId}");
+                //                await _localStorage.SetItemAsync(movie.imdbId, omdbMovie);
+                //            }
+                //            Movies.Add(omdbMovie);
+                //        }
+                //    }
+                //}
                 return new DataResponse<List<OMDBMovie>>()
                 {
                     Success = true,
-                    Data = Movies
+                    Data = response.Data.OMDBMovies
                 };
             } else
             {

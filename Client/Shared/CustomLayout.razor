@@ -1,12 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="container">
-    <div class="row">
-        <div class="col-2">
-            this is left nav
+<div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+    <header class="mb-auto">
+        <div>
+            <LoginDisplay />
+            <NavMenu />
         </div>
-        <div class="col-10">
-            this is main body
-        </div>
-    </div>
+    </header>
+    <main class="px-3">
+        @Body
+    </main>
 </div>

@@ -16,4 +16,6 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     }
 
     public DbSet<Movie> Movies => Set<Movie>();
+    public DbSet<Rating> Rating => Set<Rating>();
+    public DbSet<OMDBMovie> OMDBMovies => Set<OMDBMovie>();
 }

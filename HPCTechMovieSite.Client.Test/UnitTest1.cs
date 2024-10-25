@@ -1,6 +1,8 @@
 using HPCTechMovieSite2024.Client;
 using HPCTechMovieSite2024.Client.HttpRepo;
 using RichardSzalay.MockHttp;
+using Blazored.LocalStorage;
+using Moq;
 
 namespace HPCTechMovieSite.Client.Test;
 
@@ -16,6 +18,9 @@ public class Tests
     {
         // Arrange
         var mockHttp = new MockHttpMessageHandler();
+        var mockLocalStorage = new Mock<ILocalStorageService>();
+
+        var userName = "eric.couch@example.net";
         // Mock api/User end point which returns a UserDto
         // also mock the OMDB api return for individual movies
         string testUserResponse = """
@@ -185,10 +190,11 @@ public class Tests
 
         var client = mockHttp.ToHttpClient();
         client.BaseAddress = new Uri("https://localhost:7115/");
-        var userMoviesHttpRepo = new UserMoviesHttpRepo(client);
+        
+        var userMoviesHttpRepo = new UserMoviesHttpRepo(client, mockLocalStorage.Object);
 
         // Act
-        var response = await userMoviesHttpRepo.GetMovies();
+        var response = await userMoviesHttpRepo.GetMovies(userName);
         var movies = response.Data;
 
         // Assert 

@@ -32,27 +32,6 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
 
             if (response.Success)
             {
-                //UserDto user = response.Data;
-                //if (user is not null)
-                //{
-                //    foreach (Movie movie in user.FavoriteMovies)
-                //    {
-                        
-                //        if (movie is not null)
-                //        {
-                //            OMDBMovie omdbMovie = new();
-
-                //            omdbMovie = await _localStorage.GetItemAsync<OMDBMovie>(movie.imdbId);
-
-                //            if (omdbMovie is null)
-                //            {
-                //                omdbMovie = await _httpClient.GetFromJsonAsync<OMDBMovie>($"{OMDBUrl}{apiKey}&i={movie.imdbId}");
-                //                await _localStorage.SetItemAsync(movie.imdbId, omdbMovie);
-                //            }
-                //            Movies.Add(omdbMovie);
-                //        }
-                //    }
-                //}
                 return new DataResponse<List<OMDBMovie>>()
                 {
                     Success = true,
@@ -114,6 +93,19 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
             };
         }
         
+    }
+
+    public async Task<Response> UpdateRating(MovieUpdateRating rating)
+    {
+        try
+        {
+            var responseMsg = await _httpClient.PostAsJsonAsync("api/update-rating", rating);
+            Response res = await responseMsg.Content.ReadFromJsonAsync<Response>();
+            return res;
+        } catch (Exception ex)
+        {
+            return new Response("Update Rating Failed.");
+        }
     }
 
     public async Task<Response> RemoveMovie(string imdbId)

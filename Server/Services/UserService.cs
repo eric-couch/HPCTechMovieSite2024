@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
 using System.Net;
 using System.Net.Http.Json;
+using System.Runtime.InteropServices;
 
 namespace HPCTechMovieSite2024.Server.Services;
 
@@ -61,13 +62,38 @@ public class UserService : IUserService
             }
 
             // grab all of the omdb moves for the user and add it to the user dto
-            var omdbMoviesForUser = await (from omdb in _context.OMDBMovies
-                                           join m in _context.Movies on omdb.imdbID equals m.imdbId
-                                           join u in _context.Users on m.ApplicationUserId equals u.Id
-                                           where m.ApplicationUserId == user.Id
-                                           select omdb)
-                                           .Include(omdb => omdb.Ratings)
-                                           .ToListAsync();
+            //var omdbMoviesForUser = await (from omdb in _context.OMDBMovies
+            //                               join m in _context.Movies on omdb.imdbID equals m.imdbId
+            //                               join u in _context.Users on m.ApplicationUserId equals u.Id
+            //                               where m.ApplicationUserId == user.Id
+            //                               select omdb)
+            //                               .Include(omdb => omdb.Ratings)
+            //                               .ToListAsync();
+
+            // Query Movies for the user, including the related movies with user review and user rating
+            var userWithFavorites = await _context.Users.Include(u => u.FavoriteMovies)
+                                                        .FirstOrDefaultAsync(u => u.Id == user.Id);
+
+            // get the omdbids as a list
+            var favoriteOmdbIds = userWithFavorites.FavoriteMovies.Select(m => m.imdbId).ToList();
+
+            // Retrieve the omdb movies that match the favorites
+            var omdbMoviesForUser = await _context.OMDBMovies
+                .Where(omdb => favoriteOmdbIds.Contains(omdb.imdbID))
+                .Include(omdb => omdb.Ratings)
+                .ToListAsync();
+
+            // create a dictionary for lookup of userRatings by omdbid
+            var userRatingsByOmdbId = userWithFavorites.FavoriteMovies.ToDictionary(m => m.imdbId, m => m.userRating);
+
+            // assign the user rating to the omdb movie
+            foreach (var omdbMovie in omdbMoviesForUser)
+            {
+                if (userRatingsByOmdbId.TryGetValue(omdbMovie.imdbID, out var userRating))
+                {
+                    omdbMovie.Ratings.Add(new Rating { Source = "User", Value = userRating.ToString() });
+                }
+            }
 
             movies.OMDBMovies = omdbMoviesForUser;
 
@@ -101,6 +127,23 @@ public class UserService : IUserService
         return users;
     }
 
+    public async Task<bool> UpdateRating(MovieUpdateRating rating)
+    {
+        var userToUpdate = await _userManager.FindByNameAsync(rating.UserName);
+        if (userToUpdate is null)
+        {
+            return false;
+        }
+
+        Movie movieToUpdate = (from m in _context.Movies
+                               where m.imdbId == rating.ImdbId
+                               where m.ApplicationUserId == userToUpdate.Id
+                               select m).FirstOrDefault();
+
+        movieToUpdate.userRating = rating.Rating;
+        await _context.SaveChangesAsync();
+        return true;
+    }
     public async Task<bool> UpdateUser(UserEditDto user)
     {
         var userToUpdate = await _userManager.FindByNameAsync(user.Email);

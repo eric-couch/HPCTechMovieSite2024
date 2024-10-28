@@ -11,8 +11,11 @@
         <div class="row">
             @foreach (OMDBMovie movie in Movies)
             {
-                <div class="col-lg-3 my-4">
-                    <MovieDetails Movie="movie" OnRemoveFavoriteMovie="RemoveFavoriteMovie" AllowDelete="true" />
+                <div class="col-lg-2 my-4">
+                    <MovieDetails   Movie="movie" 
+                                    OnRemoveFavoriteMovie="RemoveFavoriteMovie" 
+                                    OnRatingChanged="MovieRatingChanged"
+                                    AllowDelete="true" />
                 </div>
             }
         </div>

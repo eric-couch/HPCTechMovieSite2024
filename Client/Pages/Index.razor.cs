@@ -49,6 +49,30 @@ public partial class Index
         }
     }
 
+    private async Task MovieRatingChanged(MovieUpdateRating rating)
+    {
+        var userAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
+        if (userAuth is not null && userAuth.IsAuthenticated)
+        {
+            rating.UserName = userAuth.Name;
+            Response response = await UserMoviesHttpRepo.UpdateRating(rating);
+            if (response.Success)
+            {
+                toastContent = $"Update Rating Successfully";
+                StateHasChanged();
+                await ToastObj.ShowAsync();
+            }
+            else
+            {
+                toastContent = $"Failed to update Rating.";
+                toastSuccess = "e-toast-warning";
+                StateHasChanged();
+                await ToastObj.ShowAsync();
+            }
+
+        }
+    }
+
     private async Task RemoveFavoriteMovie(OMDBMovie movie)
     {
 

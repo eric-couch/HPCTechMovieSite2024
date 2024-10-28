@@ -1,16 +1,33 @@
-﻿@if (Movie is not null)
+﻿@using Syncfusion.Blazor.Inputs;
+
+@if (Movie is not null)
 {
-    <div class="card border rounded bg-white">
+    <div class="card border rounded bg-white" style="width: 9rem">
         <img class="card-img-top" src=@($"https://img.omdbapi.com/?apikey=86c39163&i={Movie.imdbID}") />
     </div>
     <div class="card-body">
-        <h5>@Movie.Title (@Movie.Year)</h5>
+        <h6>@Movie.Title (@Movie.Year)</h6>
         <ul class="list-group list-group-flush">
-            @if (Movie.Actors?.Any() ?? false)
+            @if (Movie.Ratings?.Any() ?? false)
             {
-                @foreach (var actor in Movie.Actors.Split(", "))
+                @foreach (var rating in Movie.Ratings)
                 {
-                    <li class="list-group-item">@actor</li>
+                    if (rating.Source != "User")
+                    {
+                        <li class="list-group-item px-1 py-1" style="font-size: 8pt">
+                            @(new string(
+                                rating.Source.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => w[0]).ToArray()
+                                )): @rating.Value
+                        </li>
+                    } else
+                    {
+                        <SfRating   Value="@(Double.Parse(rating.Value))" 
+                                    ValueChanged="MovieRatingChanged"
+                                    EnableAnimation="true"
+                                    ItemsCount="5" 
+                                    Precision="PrecisionType.Exact"></SfRating>
+                    }
+
                 }
             }
         </ul>

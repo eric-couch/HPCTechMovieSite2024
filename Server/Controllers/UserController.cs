@@ -44,6 +44,14 @@ public class UserController : Controller
         
     }
 
+    [HttpPost]
+    [Route("api/update-rating")]
+    public async Task<Response> UpdateRating([FromBody] MovieUpdateRating rating)
+    {
+        var response = await _userService.UpdateRating(rating);
+        return new Response(response, $"Movie rating{(response?" ":" not ")}updated.");
+    }
+
     [HttpGet]
     [Route("api/users")]
     public async Task<List<UserEditDto>> GetUsers()

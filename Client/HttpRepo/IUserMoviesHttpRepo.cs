@@ -14,6 +14,7 @@ public interface IUserMoviesHttpRepo
     Task<Response> RemoveMovie(string imdbId);
 
     Task<DataResponse<List<UserEditDto>>> GetUsers();
+    Task<Response> UpdateRating(MovieUpdateRating rating);
     Task<Response> UpdateUser(UserEditDto user);
     Task<bool> EmailConfirmUser(string userId);
 

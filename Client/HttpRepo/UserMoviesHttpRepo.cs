@@ -95,6 +95,19 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
         
     }
 
+    public async Task<DataResponse<Movie>> GetMovie(string imdbId, string userName)
+    {
+        var movie = await _httpClient.GetFromJsonAsync<DataResponse<Movie>>($"api/movie?imdbId={imdbId}&userName={userName}");
+        if (movie?.Success ?? false)
+        {
+            return new DataResponse<Movie>() { Success = true, Data = movie.Data };
+        }
+        else
+        {
+            return new DataResponse<Movie>() { Success = false, Data = new Movie() };
+        }
+    }
+
     public async Task<Response> UpdateRating(MovieUpdateRating rating)
     {
         try
@@ -122,6 +135,12 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
         }
     }
 
+    public async Task<Response> UpdateMovie(Movie movie)
+    {
+        var responseFromApi = await _httpClient.PostAsJsonAsync("api/update-movie", movie);
+        Response res = await responseFromApi.Content.ReadFromJsonAsync<Response>();
+        return res;
+    }
     public async Task<Response> AddMovie(string imdbId)
     {
         try

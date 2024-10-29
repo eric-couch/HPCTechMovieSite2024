@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using HPCTechMovieSite2024.Shared.Wrapper;
 using HPCTechMovieSite2024.Server.Services;
+using Syncfusion.Blazor.Inputs;
 
 namespace HPCTechMovieSite2024.Server.Controllers;
 
@@ -17,7 +18,7 @@ public class UserController : Controller
 {
     private readonly IUserService _userService;
 
-    public UserController(      IUserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
@@ -26,7 +27,7 @@ public class UserController : Controller
     [Route("api/User")]
     public async Task<DataResponse<UserDto>> GetMovies(string? userName = null)
     {
-        
+
         if (userName is null) {
             userName = User.Identity.Name;
         }
@@ -41,7 +42,30 @@ public class UserController : Controller
         {
             return new DataResponse<UserDto>() { Data = new UserDto(), Success = false, Message = "user not found." };
         }
-        
+
+    }
+
+    [HttpGet]
+    [Route("api/movie")]
+    public async Task<DataResponse<Movie>> GetMovie(string imdbId, string userName)
+    {
+        Movie? movie = await _userService.GetMovie(imdbId, userName);
+        if (movie is not null)
+        {
+            return new DataResponse<Movie>() { Data = movie, Success = true };
+        }
+        else
+        {
+            return new DataResponse<Movie>() { Success = false, Data = new Movie() };
+        }
+    }
+
+    [HttpPost]
+    [Route("api/update-movie")]
+    public async Task<Response> UpdateMovie([FromBody] Movie movie)
+    {
+        bool response = await _userService.UpdateMovie(movie);
+        return new Response(response, $"Movie{(response ? " " : " not ")}updated.");
     }
 
     [HttpPost]

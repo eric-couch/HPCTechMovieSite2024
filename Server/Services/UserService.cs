@@ -61,15 +61,6 @@ public class UserService : IUserService
                 }
             }
 
-            // grab all of the omdb moves for the user and add it to the user dto
-            //var omdbMoviesForUser = await (from omdb in _context.OMDBMovies
-            //                               join m in _context.Movies on omdb.imdbID equals m.imdbId
-            //                               join u in _context.Users on m.ApplicationUserId equals u.Id
-            //                               where m.ApplicationUserId == user.Id
-            //                               select omdb)
-            //                               .Include(omdb => omdb.Ratings)
-            //                               .ToListAsync();
-
             // Query Movies for the user, including the related movies with user review and user rating
             var userWithFavorites = await _context.Users.Include(u => u.FavoriteMovies)
                                                         .FirstOrDefaultAsync(u => u.Id == user.Id);
@@ -106,6 +97,14 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<Movie>? GetMovie(string imdbId, string userName)
+    {
+        return await (from m in _context.Movies
+                              join u in _context.Users on m.ApplicationUserId equals u.Id
+                              where m.imdbId == imdbId
+                              where u.UserName == userName
+                              select m).FirstOrDefaultAsync();
+    }
     public async Task<List<UserEditDto>> GetUsers()
     {
         var users = (from u in _context.Users
@@ -125,6 +124,20 @@ public class UserService : IUserService
                      }).ToList();
         _logger.LogInformation("Retrieving All Users.");
         return users;
+    }
+
+    public async Task<bool> UpdateMovie(Movie movie)
+    {
+        Movie? movieToUpdate = _context.Movies.Find(movie.Id);
+
+        if (movieToUpdate is null) {
+            return false;
+        }
+
+        movieToUpdate.userReview = movie.userReview;
+        movieToUpdate.userRating = movie.userRating;
+        await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task<bool> UpdateRating(MovieUpdateRating rating)

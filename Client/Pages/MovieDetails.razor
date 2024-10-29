@@ -33,7 +33,8 @@
         </ul>
         @if (AllowDelete)
         {
-            <button class="btn btn-primary" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>
+            <button class="btn-sm btn-primary" @onclick="@(() => EditFavoriteMovie(@Movie))">Edit</button>
+            <button class="btn-sm btn-primary" @onclick="@(() => RemoveFavoriteMovie(@Movie))">Remove</button>
         }
 
         

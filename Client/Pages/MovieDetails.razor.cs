@@ -10,6 +10,8 @@ public partial class MovieDetails
     [Parameter]
     public EventCallback<OMDBMovie> OnRemoveFavoriteMovie { get; set; }
     [Parameter]
+    public EventCallback<OMDBMovie> OnEditFavoriteMovie { get; set; }
+    [Parameter]
     public EventCallback<MovieUpdateRating> OnRatingChanged { get; set; }
     [Parameter]
     public bool AllowDelete { get; set; }
@@ -18,6 +20,11 @@ public partial class MovieDetails
     private async Task RemoveFavoriteMovie(OMDBMovie movie)
     {
         await OnRemoveFavoriteMovie.InvokeAsync(movie);
+    }
+
+    private async Task EditFavoriteMovie(OMDBMovie movie)
+    {
+        await OnEditFavoriteMovie.InvokeAsync(movie);
     }
 
     public async Task MovieRatingChanged(double args)

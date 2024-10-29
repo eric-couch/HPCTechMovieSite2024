@@ -8,8 +8,10 @@ public interface IUserMoviesHttpRepo
 {
     // get movies
     Task<DataResponse<List<OMDBMovie>>> GetMovies(string userName);
+    Task<DataResponse<Movie>> GetMovie(string imdbId, string userName);
     // add movie
     Task<Response> AddMovie(string imdbId);
+    Task<Response> UpdateMovie(Movie movie);
     // remove movie
     Task<Response> RemoveMovie(string imdbId);
 

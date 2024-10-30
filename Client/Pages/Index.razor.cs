@@ -8,6 +8,7 @@ using HPCTechMovieSite2024.Client.HttpRepo;
 using System.Diagnostics;
 using Syncfusion.Blazor.PivotView;
 using HPCTechMovieSite2024.Shared.Wrapper;
+using Syncfusion.Blazor.Inputs;
 
 namespace HPCTechMovieSite2024.Client.Pages;
 
@@ -107,6 +108,16 @@ public partial class Index
             Response response = await UserMoviesHttpRepo.UpdateMovie(movieEdit);
             if (response.Success)
             {
+                var omdbMovie = (from o in Movies
+                                 where o.imdbID == movieEdit.imdbId
+                                 select o).FirstOrDefault();
+
+                var ratingObj = (from r in omdbMovie.Ratings
+                                 where r.Source == "User"
+                select r).FirstOrDefault();
+
+                ratingObj.Value = movieEdit.userRating.ToString();
+                StateHasChanged();
                 movieEdit = new();
                 IsMovieModalVisible = false;
                 toastContent = $"User Movie Updated!";
@@ -133,13 +144,6 @@ public partial class Index
     public async Task UpdateRating(double rating)
     {
         movieEdit.userRating = rating;
-        var omdbMovie = from o in Movies
-                         where o.imdbID == movieEdit.imdbId
-                         select o;
-
-        //var ratingObj = from r in omdbMovie
-        //                where 
-
     }
 
     private async Task RemoveFavoriteMovie(OMDBMovie movie)

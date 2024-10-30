@@ -1,0 +1,35 @@
+﻿@page "/topmovies"
+@using HPCTechMovieSite2024.Shared
+@using Syncfusion.Blazor.Notifications
+
+<h2>Top 10 Movies by User Score</h2>
+
+<table class="table table-striped">
+    <thead>
+        <th scope="col">Title</th>
+        <th scope="col">Rating Count</th>
+        <th scope="col">Average Rating</th>
+    </thead>
+    <tbody>
+        @if (Movies is not null)
+        {
+            @foreach (var movie in Movies) {
+                <tr>
+                    <td>@movie.Title</td>
+                    <td>@movie.NumberOfRatings</td>
+                    <td>@movie.AverageRating</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+<SfToast @ref="ToastObj"
+         Content="@toastContent"
+         CssClass="@toastSuccess"
+         ShowCloseButton="true"
+         ShowProgressBar="true"
+         Timeout="3000">
+    <ToastPosition X="Center" Y="Top"></ToastPosition>
+</SfToast>

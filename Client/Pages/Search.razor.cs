@@ -6,6 +6,7 @@ using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.PivotView;
 using Syncfusion.Blazor.Notifications;
 using HPCTechMovieSite2024.Client.HttpRepo;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace HPCTechMovieSite2024.Client.Pages;
 
@@ -15,6 +16,8 @@ public partial class Search
     public HttpClient _httpClient { get; set; }
     [Inject]
     public IUserMoviesHttpRepo UserMoviesHttpRepo { get; set; }
+    [Inject]
+    public AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     public SfPager? Page;
     public SfGrid<MovieSearchResultItem> movieGrid;
     public SfToast ToastObj;
@@ -49,21 +52,27 @@ public partial class Search
         {
             if (selectedMovies is not null)
             {
-                foreach (MovieSearchResultItem movie in selectedMovies)
+                var userAuth = (await AuthenticationStateProvider.GetAuthenticationStateAsync()).User.Identity;
+                if (userAuth is not null && userAuth.IsAuthenticated)
                 {
-                    var response = await UserMoviesHttpRepo.AddMovie(movie.imdbID);
+                    foreach (MovieSearchResultItem movie in selectedMovies)
+                    {
 
-                    if (response.Success)
-                    {
-                        toastContent = $"Added {movie.Title} to your favorites.";
-                        StateHasChanged();
-                        await ToastObj.ShowAsync();
-                    } else
-                    {
-                        toastContent = $"Failed to add movie {movie.Title} to your favorites.";
-                        toastSuccess = "e-toast-warning";
-                        StateHasChanged();
-                        await ToastObj.ShowAsync();
+                        var response = await UserMoviesHttpRepo.AddMovie(movie.imdbID, userAuth.Name);
+
+                        if (response.Success)
+                        {
+                            toastContent = $"Added {movie.Title} to your favorites.";
+                            StateHasChanged();
+                            await ToastObj.ShowAsync();
+                        }
+                        else
+                        {
+                            toastContent = $"Failed to add movie {movie.Title} to your favorites.";
+                            toastSuccess = "e-toast-warning";
+                            StateHasChanged();
+                            await ToastObj.ShowAsync();
+                        }
                     }
                 }
             }

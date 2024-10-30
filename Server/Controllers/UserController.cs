@@ -46,6 +46,21 @@ public class UserController : Controller
     }
 
     [HttpGet]
+    [Route("api/top-movies")]
+    public async Task<DataResponse<List<MovieStatistic>>> GetTopMovies(int countOfMovies)
+
+    {
+        var movies = await _userService.GetTopMovies(countOfMovies);
+        if (movies?.Any() ?? false)
+        {
+            return new DataResponse<List<MovieStatistic>>() { Data = movies, Success = true };
+        } else
+        {
+            return new DataResponse<List<MovieStatistic>>() { Data = new List<MovieStatistic>(), Success = false, Message = "No movies found." };
+        }
+    }
+
+    [HttpGet]
     [Route("api/movie")]
     public async Task<DataResponse<Movie>> GetMovie(string imdbId, string userName)
     {
@@ -111,21 +126,28 @@ public class UserController : Controller
         return res;
     }
 
-    //[HttpPost]
-    //[Route("api/add-movie")]
-    //public async Task<Response> AddMovie([FromBody] Movie movie)
-    //{
-    //    var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    [HttpPost]
+    [Route("api/add-movie")]
+    public async Task<Response> AddMovie([FromBody] Movie movie,[FromQuery] string userName)
+    {
+        //var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var res = await _userService.AddMovie(movie, userName);
+        if (res)
+        {
+            return new Response(true, "Successfully Added Movie");
+        } else
+        {
+            return new Response(false, "Failed to Add Movie");
+        }
+        //if (user is null)
+        //{
+        //    return new Response(false, "Failed to Add Movie");
+        //}
 
-    //    if (user is null)
-    //    {
-    //        return new Response(false, "Failed to Add Movie");
-    //    }
-
-    //    user.FavoriteMovies.Add(movie);
-    //    await _context.SaveChangesAsync();
-    //    return new Response(true, "Successfully Added Movie");
-    //}
+        //user.FavoriteMovies.Add(movie);
+        //await _context.SaveChangesAsync();
+        //return new Response(true, "Successfully Added Movie");
+    }
 
     //[HttpPost]
     //[Route("api/remove-movie")]

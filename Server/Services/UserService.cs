@@ -5,6 +5,7 @@ using HPCTechMovieSite2024.Shared;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging.Signing;
+using Syncfusion.Blazor.Inputs;
 using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices;
@@ -126,6 +127,42 @@ public class UserService : IUserService
         return users;
     }
 
+    public async Task<List<MovieStatistic>> GetTopMovies(int countOfMovies)
+    {
+        // join movies and omdbmovies
+        var joinedData = from m in _context.Movies
+                         join omdb in _context.OMDBMovies on m.imdbId equals omdb.imdbID
+                         select new { m, omdb };
+
+        // group by imdbid and avg the ratings
+        var groupedData = from data in joinedData
+                          group data by data.omdb into g
+                          select new MovieStatistic
+                          {
+                              Title = g.Key.Title,
+                              AverageRating = g.Average(x => x.m.userRating),
+                              NumberOfRatings = g.Count()
+                          };
+
+        var topMovies = groupedData.OrderByDescending(m => m.AverageRating).Take(countOfMovies).ToList();
+
+        return topMovies;
+    }
+
+    public async Task<bool> AddMovie(Movie movie, string userName)
+    {
+        //var userToUpdate = await _userManager.FindByNameAsync(userName);
+
+        var user = await (from u in _context.Users 
+                          where u.UserName == userName
+                          select u).FirstOrDefaultAsync();
+
+
+
+        _context.Movies.Add(new Movie() { ApplicationUserId = user.Id, imdbId = movie.imdbId, userRating = movie.userRating, userReview = movie.userReview });
+        await _context.SaveChangesAsync();
+        return true;
+    }
     public async Task<bool> UpdateMovie(Movie movie)
     {
         Movie? movieToUpdate = _context.Movies.Find(movie.Id);

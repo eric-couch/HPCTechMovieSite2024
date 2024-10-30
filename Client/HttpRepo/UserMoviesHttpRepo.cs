@@ -141,18 +141,40 @@ public class UserMoviesHttpRepo : IUserMoviesHttpRepo
         Response res = await responseFromApi.Content.ReadFromJsonAsync<Response>();
         return res;
     }
-    public async Task<Response> AddMovie(string imdbId)
+    public async Task<Response> AddMovie(string imdbId, string userName)
     {
         try
         {
+
             Movie newMovie = new Movie() { imdbId = imdbId };
-            var responseFromAPI = await _httpClient.PostAsJsonAsync("api/add-movie", newMovie);
+            var responseFromAPI = await _httpClient.PostAsJsonAsync($"api/add-movie?userName={userName}", newMovie);
             Response res = await responseFromAPI.Content.ReadFromJsonAsync<Response>();
             return res;
         }
         catch (Exception ex)
         {
             return new Response("Add Movie Failed.");
+        }
+    }
+
+    public async Task<DataResponse<List<MovieStatistic>>> GetTopMovies(int countOfMovies)
+    {
+        var movies = await _httpClient.GetFromJsonAsync<DataResponse<List<MovieStatistic>>>($"api/top-movies?countOfMovies={countOfMovies}");
+        if (movies?.Success ?? false)
+        {
+            return new DataResponse<List<MovieStatistic>>()
+            {
+                Success = true,
+                Data = movies.Data
+            };
+        } else
+        {
+            return new DataResponse<List<MovieStatistic>>()
+            {
+                Success = false,
+                Data = new List<MovieStatistic>(),
+                Message = "No movies found."
+            };
         }
     }
 

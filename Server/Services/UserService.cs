@@ -9,6 +9,8 @@ using Syncfusion.Blazor.Inputs;
 using System.Net;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace HPCTechMovieSite2024.Server.Services;
 
@@ -125,6 +127,44 @@ public class UserService : IUserService
                      }).ToList();
         _logger.LogInformation("Retrieving All Users.");
         return users;
+    }
+    
+    public async Task<string> SearchFavorites(string searchTerm)
+    {
+        try
+        {
+            var title = new List<string>();
+
+            using (var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "SELECT Title FROM OMDBMovies WHERE Title LIKE '%" + searchTerm + "%'";
+                _context.Database.OpenConnection();
+
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        title.Add(reader.GetString(0));
+                    }
+                }
+            }
+
+            StringBuilder htmlBuilder = new StringBuilder();
+            htmlBuilder.Append("<ul>");
+
+            foreach (var t in title)
+            {
+                htmlBuilder.Append($"<li>{System.Web.HttpUtility.HtmlEncode(t)}</li>");
+            }
+
+            htmlBuilder.Append("</ul>");
+
+            return htmlBuilder.ToString();
+        } catch (Exception ex)
+        {
+            _logger.LogError("Error searching favorites: {ex.Message}", ex.Message);
+            return "Error searching favorites";
+        }
     }
 
     public async Task<List<MovieStatistic>> GetTopMovies(int countOfMovies)

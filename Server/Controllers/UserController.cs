@@ -61,6 +61,13 @@ public class UserController : Controller
     }
 
     [HttpGet]
+    [Route("api/search-favorites")]
+    public async Task<string> SearchFavorites(string searchTerm)
+    {
+        return await _userService.SearchFavorites(searchTerm);
+    }
+
+    [HttpGet]
     [Route("api/movie")]
     public async Task<DataResponse<Movie>> GetMovie(string imdbId, string userName)
     {

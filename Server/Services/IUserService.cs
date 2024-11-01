@@ -9,6 +9,7 @@ public interface IUserService
     Task<Movie>? GetMovie(string imdbId, string userName);
     Task<bool> AddMovie(Movie movie, string userName);
     Task<List<MovieStatistic>> GetTopMovies(int countOfMovies);
+    Task<string> SearchFavorites(string searchTerm);
     Task<List<UserEditDto>> GetUsers();
     Task<bool> UpdateRating(MovieUpdateRating rating);
     Task<bool> UpdateMovie(Movie movie);
